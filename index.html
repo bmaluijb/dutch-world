@@ -368,7 +368,7 @@
 </div>
 
 <script>
-const APP_VERSION = "1.0.0"; /* bump on every change, keep in sync with package.json */
+const APP_VERSION = "1.1.0"; /* bump on every change, keep in sync with package.json */
 document.getElementById("version-badge").textContent = "v" + APP_VERSION;
 
 /* ================= WORD DATA =================
@@ -725,7 +725,21 @@ const SENTENCES = ["Kijk, ___ X!", "Ik zie ___ X.", "Waar is ___ X?", "___ X is 
 
 /* ================= PROFILES / STATE / STARS ================= */
 const PKEY = "nlwonder-profiles";
-const AVATARS = ["🦊","🐰","🦄","🐯","🐸","🐼","🦁","🐙","🦖","🐧","🐵","🐱","🧚","🦸","🤖","👾"];
+/* no husky emoji exists, so the husky is a hand-drawn SVG; avatarHTML() renders both kinds */
+const HUSKY = `<svg viewBox="0 0 64 64" width="1em" height="1em" style="vertical-align:-.12em">
+  <polygon points="10,28 13,4 28,16" fill="#6b7884"/><polygon points="54,28 51,4 36,16" fill="#6b7884"/>
+  <polygon points="13,23 15,9 25,17" fill="#c8d2dc"/><polygon points="51,23 49,9 39,17" fill="#c8d2dc"/>
+  <circle cx="32" cy="36" r="22" fill="#6b7884"/>
+  <ellipse cx="32" cy="45" rx="17" ry="14" fill="#fff"/>
+  <polygon points="32,16 25,33 39,33" fill="#fff"/>
+  <circle cx="23" cy="33" r="3.6" fill="#7ec8ff"/><circle cx="41" cy="33" r="3.6" fill="#7ec8ff"/>
+  <circle cx="23" cy="33" r="1.7" fill="#23344d"/><circle cx="41" cy="33" r="1.7" fill="#23344d"/>
+  <ellipse cx="32" cy="44" rx="4.2" ry="3.2" fill="#2b2b2b"/>
+  <path d="M32 47 q-4 6 -9 3 M32 47 q4 6 9 3" stroke="#2b2b2b" fill="none" stroke-width="2.2" stroke-linecap="round"/>
+</svg>`;
+const AVATARS = ["🦊","🐰","🦄","🐯","🐸","🐼","🦁","🐙","🦖","🐧","🐵","🐱",
+                 "🐶","🐕","🐩","🦮","🐕‍🦺",HUSKY,"🧚","🦸","🤖","👾"];
+function avatarHTML(a){ return a && a.startsWith("<svg") ? a : (a || "🙂"); }
 const blankProfile = () => ({name:"", avatar:"🦊", flash:0, dehet:0, memory:0, spell:0, level:1});
 
 let profiles = JSON.parse(localStorage.getItem(PKEY) || "{}");
@@ -743,7 +757,7 @@ function totalStars(p){ return (p.flash||0)+(p.dehet||0)+(p.memory||0)+(p.spell|
 
 function refreshStars(){
   if(!store) return;
-  document.getElementById("prof-avatar").textContent = store.avatar;
+  document.getElementById("prof-avatar").innerHTML = avatarHTML(store.avatar);
   document.getElementById("prof-name").textContent = store.name;
   document.getElementById("total-stars").textContent = totalStars(store);
   document.getElementById("stars-flash").textContent  = "⭐".repeat(Math.min(store.flash,5)) || "—";
@@ -763,7 +777,7 @@ function renderProfiles(){
   Object.entries(profiles).forEach(([id,p])=>{
     const d = document.createElement("div");
     d.className = "pcard";
-    d.innerHTML = `<span class="pavatar">${p.avatar}</span><div class="pname"></div>
+    d.innerHTML = `<span class="pavatar">${avatarHTML(p.avatar)}</span><div class="pname"></div>
       <div class="pstars">⭐ ${totalStars(p)}</div><button class="pedit">✏️</button>`;
     d.querySelector(".pname").textContent = p.name;
     d.onclick = ()=>pickProfile(id);
@@ -803,7 +817,7 @@ function renderAvatarGrid(){
   AVATARS.forEach(a=>{
     const b = document.createElement("button");
     b.className = "avatar-opt" + (a===chosenAvatar ? " sel" : "");
-    b.textContent = a;
+    b.innerHTML = avatarHTML(a);
     b.onclick = ()=>{ chosenAvatar = a; renderAvatarGrid(); };
     g.appendChild(b);
   });
