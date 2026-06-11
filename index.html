@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nederlands Wonderland 🌷</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body {
+    font-family: "Comic Sans MS", "Segoe UI", system-ui, sans-serif;
+    background: linear-gradient(180deg,#7ec8ff 0%,#aee3ff 45%,#7ed98c 45.2%,#5cc06d 100%);
+    min-height:100vh; color:#23344d; overflow-x:hidden;
+  }
+  .screen { display:none; max-width:880px; margin:0 auto; padding:18px; min-height:100vh; }
+  .screen.active { display:block; animation:pop .35s ease; }
+  @keyframes pop { from{transform:scale(.96);opacity:0} to{transform:scale(1);opacity:1} }
+  @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  @keyframes burst { from{transform:scale(.3);opacity:1} to{transform:scale(1.6);opacity:0} }
+
+  h1 { text-align:center; font-size:clamp(1.6rem,5vw,2.6rem); color:#fff;
+       text-shadow:0 3px 0 rgba(0,0,0,.18); margin:10px 0 4px; }
+  .subtitle { text-align:center; color:#fff; opacity:.95; margin-bottom:14px; font-size:1.05rem; }
+
+  .stars-bar { text-align:center; background:rgba(255,255,255,.85); border-radius:30px;
+    padding:8px 18px; width:fit-content; margin:0 auto 14px; font-size:1.15rem; font-weight:bold;
+    box-shadow:0 3px 10px rgba(0,0,0,.12); }
+
+  .level-bar { display:flex; gap:10px; justify-content:center; margin-bottom:18px; }
+  .btn-level { background:rgba(255,255,255,.7); border-radius:20px; padding:10px 22px;
+    font-size:1.05rem; font-weight:bold; color:#23344d; box-shadow:0 3px 0 rgba(0,0,0,.15);
+    border:3px solid transparent; }
+  .btn-level.sel { background:#ffb703; border-color:#fff; transform:scale(1.06); }
+  .btn-level:active { transform:translateY(2px); }
+
+  .islands { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; }
+  .island { background:#fff; border-radius:24px; padding:22px 16px; text-align:center;
+    cursor:pointer; border:4px solid transparent; box-shadow:0 6px 0 rgba(0,0,0,.12);
+    transition:transform .15s, border-color .15s; }
+  .island:hover { transform:translateY(-5px) scale(1.02); border-color:#ffb703; }
+  .island:active { transform:translateY(1px); }
+  .island .emoji { font-size:3.4rem; display:inline-block; animation:floaty 3s ease-in-out infinite; }
+  .island h2 { font-size:1.25rem; margin:8px 0 4px; }
+  .island p { font-size:.92rem; color:#5a6b85; }
+  .island .stars { margin-top:8px; font-size:1.1rem; letter-spacing:2px; }
+
+  .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+  button { font-family:inherit; cursor:pointer; border:none; }
+  .btn-back { background:rgba(255,255,255,.9); border-radius:20px; padding:8px 18px;
+    font-size:1rem; font-weight:bold; color:#23344d; box-shadow:0 3px 0 rgba(0,0,0,.15); }
+  .btn-back:active { transform:translateY(2px); box-shadow:none; }
+  .score-chip { background:rgba(255,255,255,.9); border-radius:20px; padding:8px 16px;
+    font-weight:bold; box-shadow:0 3px 0 rgba(0,0,0,.15); }
+
+  .card { background:#fff; border-radius:26px; padding:26px 20px; text-align:center;
+    box-shadow:0 8px 22px rgba(0,0,0,.15); max-width:560px; margin:0 auto; }
+  .big-emoji { font-size:5.2rem; margin-bottom:6px; display:inline-block; }
+  .word { font-size:2rem; font-weight:bold; margin:4px 0; }
+  .word .blank { color:#ffb703; letter-spacing:2px; }
+  .translation { color:#5a6b85; font-size:1.15rem; margin-bottom:14px; }
+
+  .btn-row { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+  .btn-big { font-size:1.6rem; font-weight:bold; padding:16px 44px; border-radius:22px;
+    color:#fff; box-shadow:0 5px 0 rgba(0,0,0,.2); transition:transform .1s; }
+  .btn-big:active { transform:translateY(3px); box-shadow:none; }
+  .btn-de  { background:#ff6b6b; }
+  .btn-het { background:#4d96ff; }
+  .btn-green { background:#41b06e; font-size:1.15rem; padding:12px 30px; }
+  .btn-sound { background:#ffb703; color:#23344d; font-size:1.05rem; padding:10px 22px;
+    border-radius:18px; font-weight:bold; box-shadow:0 4px 0 rgba(0,0,0,.18); }
+  .btn-sound:active { transform:translateY(2px); box-shadow:none; }
+
+  .feedback { min-height:120px; margin-top:14px; }
+  .verdict { font-size:1.4rem; font-weight:bold; }
+  .verdict.good { color:#2e9e5b; }
+  .verdict.bad  { color:#e44; }
+  .rule-tip { background:#fff8e1; border:3px dashed #ffb703; border-radius:16px;
+    padding:12px 14px; margin-top:10px; font-size:1rem; text-align:left; }
+  .rule-tip b { color:#c77800; }
+
+  .streak { font-size:1.2rem; margin-top:6px; }
+  .progressbar { background:#e8eef9; border-radius:12px; height:18px; margin:12px auto 0; max-width:420px; overflow:hidden; }
+  .progressbar > div { background:linear-gradient(90deg,#41b06e,#8fe3a5); height:100%; width:0%;
+    transition:width .4s; border-radius:12px; }
+
+  /* memory game */
+  .memory-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; max-width:520px; margin:0 auto; }
+  .mcard { aspect-ratio:1; background:#4d96ff; border-radius:16px; display:flex; align-items:center;
+    justify-content:center; font-size:1.9rem; cursor:pointer; color:#fff; font-weight:bold;
+    box-shadow:0 4px 0 rgba(0,0,0,.2); transition:transform .35s; user-select:none; text-align:center; padding:4px; }
+  /* 360° spin = flip effect WITHOUT mirroring the text */
+  .mcard.flipped { background:#fff; color:#23344d; transform:rotateY(360deg); }
+  .mcard.matched { background:#b9f0c9; color:#23344d; cursor:default; box-shadow:none; }
+  .mcard .small { font-size:.95rem; line-height:1.2; }
+
+  /* flashcards */
+  .flash-nav { display:flex; gap:12px; justify-content:center; margin-top:16px; }
+  .article-badge { display:inline-block; padding:4px 16px; border-radius:14px; color:#fff;
+    font-weight:bold; font-size:1.3rem; margin-right:6px; }
+  .badge-de { background:#ff6b6b; } .badge-het { background:#4d96ff; }
+
+  .confetti { position:fixed; font-size:2rem; pointer-events:none; animation:burst .9s ease-out forwards; z-index:99; }
+
+  /* spelling bee */
+  .slot-row, .tile-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+  .slot { width:44px; height:52px; border-bottom:5px solid #cdd9f5; border-radius:8px;
+    background:#f1f5ff; font-size:1.7rem; font-weight:bold; display:flex; align-items:center;
+    justify-content:center; color:#23344d; }
+  .slot.filled { background:#e3edff; border-bottom-color:#4d96ff; }
+  .tile { width:48px; height:52px; border-radius:12px; background:#ffb703; color:#23344d;
+    font-size:1.6rem; font-weight:bold; box-shadow:0 4px 0 rgba(0,0,0,.18); transition:transform .1s; }
+  .tile:active { transform:translateY(3px); box-shadow:none; }
+  .tile:disabled { opacity:.25; box-shadow:none; cursor:default; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+  .shake { animation:shake .35s; }
+  .spell-input { font-family:inherit; font-size:1.5rem; font-weight:bold; text-align:center;
+    padding:12px 16px; border-radius:16px; border:3px solid #cdd9f5; width:90%; max-width:380px;
+    color:#23344d; outline:none; }
+  .spell-input:focus { border-color:#4d96ff; }
+
+  /* profiles */
+  .profile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:16px; max-width:720px; margin:0 auto; }
+  .pcard { position:relative; background:#fff; border-radius:22px; padding:20px 12px; text-align:center;
+    cursor:pointer; border:4px solid transparent; box-shadow:0 6px 0 rgba(0,0,0,.12); transition:transform .15s, border-color .15s; }
+  .pcard:hover { transform:translateY(-4px); border-color:#ffb703; }
+  .pcard .pavatar { font-size:3.2rem; display:block; }
+  .pcard .pname { font-size:1.25rem; font-weight:bold; margin-top:4px; }
+  .pcard .pstars { color:#c77800; font-weight:bold; margin-top:4px; }
+  .pcard.new { background:rgba(255,255,255,.65); border:4px dashed #fff; }
+  .pcard .pedit { position:absolute; top:8px; right:8px; background:#f1f5ff; border-radius:12px;
+    padding:4px 8px; font-size:1rem; box-shadow:0 2px 0 rgba(0,0,0,.12); }
+  .pcard .pedit:active { transform:translateY(2px); box-shadow:none; }
+  .profile-chip { cursor:pointer; background:#f1f5ff; border-radius:16px; padding:3px 12px; }
+  .profile-chip:hover { background:#e3edff; }
+  .avatar-grid { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  .avatar-opt { font-size:1.9rem; padding:6px 10px; border-radius:14px; background:#f1f5ff;
+    border:3px solid transparent; }
+  .avatar-opt.sel { border-color:#ffb703; background:#fff3d1; transform:scale(1.12); }
+
+  .rules-box { background:#fff; border-radius:22px; padding:20px; max-width:640px; margin:16px auto;
+    box-shadow:0 6px 18px rgba(0,0,0,.15); font-size:1.02rem; line-height:1.55; }
+  .rules-box h3 { color:#c77800; margin:10px 0 4px; }
+  .tag-de, .tag-het { padding:1px 10px; border-radius:10px; color:#fff; font-weight:bold; }
+  .tag-de { background:#ff6b6b; } .tag-het { background:#4d96ff; }
+
+  .clouds { position:fixed; top:0; left:0; width:100%; pointer-events:none; z-index:-1; }
+  .cloud { position:absolute; font-size:3rem; opacity:.8; animation:drift linear infinite; }
+  @keyframes drift { from{transform:translateX(-120px)} to{transform:translateX(110vw)} }
+</style>
+</head>
+<body>
+
+<div class="clouds">
+  <span class="cloud" style="top:30px; animation-duration:55s;">☁️</span>
+  <span class="cloud" style="top:90px; animation-duration:80s; animation-delay:-30s;">☁️</span>
+  <span class="cloud" style="top:160px; animation-duration:65s; animation-delay:-15s;">⛅</span>
+</div>
+
+<!-- ===================== PROFILE PICKER ===================== -->
+<div class="screen active" id="profiles">
+  <h1>🌷 Nederlands Wonderland 🌷</h1>
+  <p class="subtitle">Wie ben jij? &nbsp;·&nbsp; Who is playing today?</p>
+  <div class="profile-grid" id="profile-grid"></div>
+</div>
+
+<!-- ===================== PROFILE CREATE / EDIT ===================== -->
+<div class="screen" id="profedit">
+  <div class="topbar">
+    <button class="btn-back" onclick="openProfiles()">⬅️ Terug</button>
+    <span class="score-chip" id="profedit-title">✨ Nieuw profiel</span>
+    <span></span>
+  </div>
+  <div class="card">
+    <p style="font-size:1.2rem; font-weight:bold; margin-bottom:10px;">Kies je dier! · Pick your animal!</p>
+    <div class="avatar-grid" id="avatar-grid"></div>
+    <p style="font-size:1.2rem; font-weight:bold; margin:16px 0 8px;">Hoe heet je? · What's your name?</p>
+    <input id="profname-input" class="spell-input" maxlength="14" autocomplete="off"
+      placeholder="jouw naam…" onkeydown="if(event.key==='Enter') saveProfile()">
+    <div class="btn-row">
+      <button class="btn-big btn-green" onclick="saveProfile()">💾 Klaar!</button>
+      <button class="btn-big" id="profdel-btn" style="background:#e44; display:none;"
+        onclick="deleteProfile()">🗑️ Weg ermee</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== HOME ===================== -->
+<div class="screen" id="home">
+  <h1>🌷 Nederlands Wonderland 🌷</h1>
+  <p class="subtitle">Kies een eiland en ga op avontuur! &nbsp;·&nbsp; Pick an island and start your adventure!</p>
+  <div class="stars-bar"><span class="profile-chip" onclick="openProfiles()"><span id="prof-avatar">🙂</span>
+    <span id="prof-name">…</span> 🔄</span> &nbsp; ⭐ <span id="total-stars">0</span> sterren</div>
+  <div class="level-bar">
+    <button class="btn-level" id="lvl1-btn" onclick="setLevel(1)">🐣 Level 1 — Beginner</button>
+    <button class="btn-level" id="lvl2-btn" onclick="setLevel(2)">🦁 Level 2 — Expert</button>
+  </div>
+  <div class="islands">
+    <div class="island" onclick="openFlash()">
+      <span class="emoji">🦜</span>
+      <h2>Woorden-eiland</h2>
+      <p>Learn new words with pictures and sound!<br>Leer nieuwe woorden!</p>
+      <div class="stars" id="stars-flash"></div>
+    </div>
+    <div class="island" onclick="openDehet()">
+      <span class="emoji">🏖️</span>
+      <h2>De-of-Het Strand</h2>
+      <p>The famous puzzle: is it <b style="color:#ff6b6b">de</b> or <b style="color:#4d96ff">het</b>?</p>
+      <div class="stars" id="stars-dehet"></div>
+    </div>
+    <div class="island" onclick="openMemory()">
+      <span class="emoji">🐒</span>
+      <h2>Memory-jungle</h2>
+      <p>Match the Dutch word with its picture!<br>Zoek de paartjes!</p>
+      <div class="stars" id="stars-memory"></div>
+    </div>
+    <div class="island" onclick="openSpell()">
+      <span class="emoji">🐝</span>
+      <h2>Spelling-bij</h2>
+      <p>Hear the word, then spell it!<br>Luister en spel het woord!</p>
+      <div class="stars" id="stars-spell"></div>
+    </div>
+    <div class="island" onclick="openRules()">
+      <span class="emoji">🦉</span>
+      <h2>Uil-school</h2>
+      <p>The wise owl explains the secret tricks of <b>de</b> and <b>het</b>.</p>
+      <div class="stars">📖</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FLASHCARDS ===================== -->
+<div class="screen" id="flash">
+  <div class="topbar">
+    <button class="btn-back" onclick="goHome()">⬅️ Terug</button>
+    <span class="score-chip">🦜 Woorden-eiland</span>
+    <span class="score-chip" id="flash-count">1 / 10</span>
+  </div>
+  <div class="card">
+    <span class="big-emoji" id="flash-emoji">🐱</span>
+    <div class="word"><span id="flash-article" class="article-badge badge-de">de</span><span id="flash-word">kat</span></div>
+    <div class="translation" id="flash-trans">the cat</div>
+    <button class="btn-sound" onclick="speakCurrent()">🔊 Luister! (Listen)</button>
+    <div class="flash-nav">
+      <button class="btn-big btn-green" onclick="flashNext()">Volgende ➡️</button>
+    </div>
+    <div class="progressbar"><div id="flash-progress"></div></div>
+  </div>
+</div>
+
+<!-- ===================== DE / HET GAME ===================== -->
+<div class="screen" id="dehet">
+  <div class="topbar">
+    <button class="btn-back" onclick="goHome()">⬅️ Terug</button>
+    <span class="score-chip">🏖️ De of Het?</span>
+    <span class="score-chip">✅ <span id="dh-score">0</span> &nbsp; 🔥 <span id="dh-streak">0</span></span>
+  </div>
+  <div class="card">
+    <span class="big-emoji" id="dh-emoji">🐶</span>
+    <div class="word" id="dh-word">hond</div>
+    <div class="translation" id="dh-trans">dog</div>
+    <button class="btn-sound" onclick="speak(currentDH.nl)">🔊 Luister!</button>
+    <div class="btn-row">
+      <button class="btn-big btn-de" onclick="answerDH('de')">de</button>
+      <button class="btn-big btn-het" onclick="answerDH('het')">het</button>
+    </div>
+    <div class="feedback" id="dh-feedback"></div>
+    <div class="progressbar"><div id="dh-progress"></div></div>
+  </div>
+</div>
+
+<!-- ===================== MEMORY ===================== -->
+<div class="screen" id="memory">
+  <div class="topbar">
+    <button class="btn-back" onclick="goHome()">⬅️ Terug</button>
+    <span class="score-chip">🐒 Memory-jungle</span>
+    <span class="score-chip">🔄 <span id="mem-moves">0</span> beurten</span>
+  </div>
+  <div class="memory-grid" id="memory-grid"></div>
+  <div style="text-align:center; margin-top:16px;">
+    <button class="btn-big btn-green" onclick="startMemory()">🔄 Opnieuw (Again)</button>
+  </div>
+</div>
+
+<!-- ===================== SPELLING BEE ===================== -->
+<div class="screen" id="spell">
+  <div class="topbar">
+    <button class="btn-back" onclick="goHome()">⬅️ Terug</button>
+    <span class="score-chip">🐝 Spelling-bij</span>
+    <span class="score-chip" id="sp-count">1 / 8</span>
+  </div>
+  <div class="card">
+    <span class="big-emoji" id="sp-emoji">🐝</span>
+    <div class="translation" id="sp-trans">the bee</div>
+    <button class="btn-sound" onclick="speakSpell()">🔊 Luister! (Listen)</button>
+    <div id="sp-hint" class="translation" style="margin-top:8px;"></div>
+
+    <!-- Level 1: letter tiles -->
+    <div id="sp-tiles-area">
+      <div class="slot-row" id="sp-slots"></div>
+      <div class="tile-row" id="sp-tiles"></div>
+      <div class="btn-row">
+        <button class="btn-sound" onclick="spBackspace()">⌫ Oeps!</button>
+      </div>
+    </div>
+
+    <!-- Level 2: type it -->
+    <div id="sp-type-area" style="display:none; margin-top:14px;">
+      <input id="sp-input" class="spell-input" autocomplete="off" autocapitalize="off"
+        spellcheck="false" placeholder="typ hier… (bijv. het huis)"
+        onkeydown="if(event.key==='Enter') spCheckTyped()">
+      <div class="btn-row">
+        <button class="btn-big btn-green" onclick="spCheckTyped()">✅ Check!</button>
+      </div>
+    </div>
+
+    <div class="feedback" id="sp-feedback"></div>
+    <div class="progressbar"><div id="sp-progress"></div></div>
+  </div>
+</div>
+
+<!-- ===================== RULES (OWL SCHOOL) ===================== -->
+<div class="screen" id="rules">
+  <div class="topbar">
+    <button class="btn-back" onclick="goHome()">⬅️ Terug</button>
+    <span class="score-chip">🦉 Uil-school</span>
+    <span></span>
+  </div>
+  <div class="rules-box">
+    <div style="text-align:center; font-size:3.5rem;">🦉</div>
+    <p style="text-align:center;"><b>Oehoe! The wise owl's secret tricks for de &amp; het:</b></p>
+
+    <h3>🥇 The golden rule</h3>
+    <p>About 2 out of 3 words are <span class="tag-de">de</span>. If you really have to guess… guess <b>de</b>!</p>
+
+    <h3>🐤 Tiny words trick</h3>
+    <p>Little/cute words ending in <b>-je</b> are ALWAYS <span class="tag-het">het</span>:
+    het hond<b>je</b>, het huis<b>je</b>, het ijs<b>je</b>… every single time! 🎉</p>
+
+    <h3>👫 More than one trick</h3>
+    <p>More than one of something? ALWAYS <span class="tag-de">de</span>: <b>de</b> honden, <b>de</b> huizen, <b>de</b> boeken — even when one of them is het (het huis → de huizen)!</p>
+
+    <h3>🧑 People trick</h3>
+    <p>Words for people are almost always <span class="tag-de">de</span>: de vader, de juf, de bakker, de vriend.
+    (Sneaky exceptions: <b>het</b> kind, <b>het</b> meisje!)</p>
+
+    <h3>🍓 Fruit, veggies &amp; trees</h3>
+    <p>Almost always <span class="tag-de">de</span>: de appel, de banaan, de boom.</p>
+
+    <h3>🔤 Word-ending tricks</h3>
+    <p>Ends in <b>-ing, -heid, -ij, -el, -er</b>? Usually <span class="tag-de">de</span> (de koning, de vrijheid, de bakkerij).<br>
+    Ends in <b>-um, -ment, -isme</b>? Usually <span class="tag-het">het</span> (het museum, het moment).<br>
+    Super sneaky exception: <b>het</b> schilderij! 🎨</p>
+
+    <h3>🏁 The ge- trick</h3>
+    <p>Words starting with <b>ge-</b> are very often <span class="tag-het">het</span>: het geheim, het gevaar, het gebouw, het gesprek.</p>
+
+    <h3>🌍 Languages, metals &amp; sports</h3>
+    <p>Usually <span class="tag-het">het</span>: het Nederlands, het goud, het voetbal.</p>
+
+    <h3>💡 The best trick of all</h3>
+    <p>Learn every new word <b>together with its article</b> — never just "huis", always "<b>het</b> huis".
+    Say it out loud, sing it, shout it! Your ears will learn it for you. 🎵</p>
+  </div>
+</div>
+
+<script>
+/* ================= WORD DATA =================
+   [dutch, english, article, emoji, level, category, customTip?]
+   category drives the owl tip shown after each de/het answer. */
+const RAW = [
+  /* ---------- LEVEL 1 : animals ---------- */
+  ["hond","dog","de","🐶",1,"animal"],
+  ["kat","cat","de","🐱",1,"animal"],
+  ["vis","fish","de","🐟",1,"animal"],
+  ["koe","cow","de","🐮",1,"animal"],
+  ["vogel","bird","de","🐦",1,"animal"],
+  ["muis","mouse","de","🐭",1,"animal"],
+  ["beer","bear","de","🐻",1,"animal"],
+  ["leeuw","lion","de","🦁",1,"animal"],
+  ["tijger","tiger","de","🐯",1,"animal"],
+  ["olifant","elephant","de","🐘",1,"animal"],
+  ["aap","monkey","de","🐵",1,"animal"],
+  ["slang","snake","de","🐍",1,"animal"],
+  ["kip","chicken","de","🐔",1,"animal"],
+  ["eend","duck","de","🦆",1,"animal"],
+  ["uil","owl","de","🦉",1,"animal"],
+  ["vlinder","butterfly","de","🦋",1,"animal"],
+  ["bij","bee","de","🐝",1,"animal"],
+  ["spin","spider","de","🕷️",1,"animal"],
+  ["kikker","frog","de","🐸",1,"animal"],
+  ["schildpad","turtle","de","🐢",1,"animal"],
+  ["papegaai","parrot","de","🦜",1,"animal"],
+  ["pinguïn","penguin","de","🐧",1,"animal"],
+  ["dolfijn","dolphin","de","🐬",1,"animal"],
+  ["haai","shark","de","🦈",1,"animal"],
+  ["wolf","wolf","de","🐺",1,"animal"],
+  ["vos","fox","de","🦊",1,"animal"],
+  ["giraffe","giraffe","de","🦒",1,"animal"],
+  ["zebra","zebra","de","🦓",1,"animal"],
+  ["kameel","camel","de","🐫",1,"animal"],
+  ["krokodil","crocodile","de","🐊",1,"animal"],
+  ["eenhoorn","unicorn","de","🦄",1,"animal"],
+  ["dinosaurus","dinosaur","de","🦕",1,"animal"],
+  ["paard","horse","het","🐴",1,"animalx"],
+  ["schaap","sheep","het","🐑",1,"animalx"],
+  ["konijn","rabbit","het","🐰",1,"animalx"],
+  ["varken","pig","het","🐷",1,"animalx"],
+  ["hert","deer","het","🦌",1,"animalx"],
+  ["kuiken","chick","het","🐥",1,"animalx"],
+
+  /* ---------- LEVEL 1 : food & drink ---------- */
+  ["appel","apple","de","🍎",1,"fruit"],
+  ["banaan","banana","de","🍌",1,"fruit"],
+  ["aardbei","strawberry","de","🍓",1,"fruit"],
+  ["druif","grape","de","🍇",1,"fruit"],
+  ["citroen","lemon","de","🍋",1,"fruit"],
+  ["sinaasappel","orange","de","🍊",1,"fruit"],
+  ["peer","pear","de","🍐",1,"fruit"],
+  ["tomaat","tomato","de","🍅",1,"fruit"],
+  ["wortel","carrot","de","🥕",1,"fruit"],
+  ["brood","bread","het","🍞",1,"het"],
+  ["kaas","cheese","de","🧀",1,"de","<b>de kaas</b> — lekker! 😋"],
+  ["melk","milk","de","🥛",1,"drink"],
+  ["thee","tea","de","🍵",1,"drink"],
+  ["koffie","coffee","de","☕",1,"drink"],
+  ["sap","juice","het","🧃",1,"het","sneaky drink! Most drinks are de, but <b>het sap</b> &amp; <b>het water</b>!"],
+  ["water","water","het","💧",1,"het"],
+  ["soep","soup","de","🍲",1,"de"],
+  ["pizza","pizza","de","🍕",1,"de"],
+  ["pannenkoek","pancake","de","🥞",1,"de"],
+  ["friet","fries","de","🍟",1,"de"],
+  ["ei","egg","het","🥚",1,"het"],
+  ["snoepje","candy","het","🍬",1,"je"],
+  ["koekje","cookie","het","🍪",1,"je"],
+  ["ijsje","ice cream","het","🍦",1,"je"],
+  ["chocolade","chocolate","de","🍫",1,"de"],
+  ["taart","cake","de","🎂",1,"de","<b>de taart</b> — yum! But: het taart<b>je</b> (ends in -je)!"],
+  ["boter","butter","de","🧈",1,"de"],
+  ["suiker","sugar","de","🍚",1,"de"],
+
+  /* ---------- LEVEL 1 : people ---------- */
+  ["vader","father","de","👨",1,"person"],
+  ["moeder","mother","de","👩",1,"person"],
+  ["opa","grandpa","de","👴",1,"person"],
+  ["oma","grandma","de","👵",1,"person"],
+  ["broer","brother","de","👦",1,"person"],
+  ["zus","sister","de","👧",1,"person"],
+  ["baby","baby","de","👶",1,"person"],
+  ["juf","teacher (f)","de","👩‍🏫",1,"person"],
+  ["bakker","baker","de","🧑‍🍳",1,"person"],
+  ["dokter","doctor","de","🧑‍⚕️",1,"person"],
+  ["politieagent","police officer","de","👮",1,"person"],
+  ["vriend","friend","de","🤝",1,"person"],
+  ["kind","child","het","🧒",1,"het","sneaky exception! People are usually de, but it's <b>het kind</b>."],
+  ["meisje","girl","het","👧",1,"je"],
+  ["jongetje","little boy","het","👦",1,"je"],
+
+  /* ---------- LEVEL 1 : home & things ---------- */
+  ["huis","house","het","🏠",1,"het"],
+  ["boek","book","het","📖",1,"het","<b>het boek</b> — but more than one is always de: de boeken!"],
+  ["tafel","table","de","🪑",1,"de"],
+  ["stoel","chair","de","🪑",1,"de","<b>de stoel</b>, de tafel — most furniture is de (but het bed!)"],
+  ["bed","bed","het","🛏️",1,"het","sneaky one: <b>het bed</b>! Sweet dreams 😴"],
+  ["lamp","lamp","de","💡",1,"de"],
+  ["bank","sofa","de","🛋️",1,"de"],
+  ["televisie","television","de","📺",1,"de"],
+  ["telefoon","phone","de","📱",1,"de"],
+  ["computer","computer","de","💻",1,"de"],
+  ["klok","clock","de","🕐",1,"de"],
+  ["sleutel","key","de","🗝️",1,"de"],
+  ["spiegel","mirror","de","🪞",1,"de"],
+  ["deur","door","de","🚪",1,"de","<b>de deur</b> — knock knock!"],
+  ["raam","window","het","🪟",1,"het","<b>het raam</b> — parts of the house are often het!"],
+  ["dak","roof","het","⛺",1,"het"],
+  ["trap","stairs","de","🪜",1,"de"],
+  ["toilet","toilet","het","🚽",1,"het"],
+  ["tuin","garden","de","🌻",1,"de"],
+  ["kussen","pillow","het","🛌",1,"het"],
+  ["deken","blanket","de","🧣",1,"de"],
+  ["bord","plate","het","🍽️",1,"het"],
+  ["glas","glass","het","🥛",1,"het"],
+  ["fles","bottle","de","🍾",1,"de"],
+  ["lepel","spoon","de","🥄",1,"de"],
+  ["vork","fork","de","🍴",1,"de"],
+  ["mes","knife","het","🔪",1,"het"],
+
+  /* ---------- LEVEL 1 : clothes ---------- */
+  ["jas","coat","de","🧥",1,"de"],
+  ["broek","trousers","de","👖",1,"de"],
+  ["shirt","shirt","het","👕",1,"het"],
+  ["schoen","shoe","de","👟",1,"de"],
+  ["sok","sock","de","🧦",1,"de"],
+  ["muts","beanie","de","🧢",1,"de"],
+  ["trui","sweater","de","🧶",1,"de"],
+  ["jurk","dress","de","👗",1,"de"],
+  ["bril","glasses","de","👓",1,"de"],
+  ["hoed","hat","de","🎩",1,"de"],
+
+  /* ---------- LEVEL 1 : nature & outside ---------- */
+  ["boom","tree","de","🌳",1,"plant"],
+  ["bloem","flower","de","🌷",1,"plant"],
+  ["zon","sun","de","☀️",1,"de","<b>de zon</b> en <b>de maan</b> — sky friends are de!"],
+  ["maan","moon","de","🌙",1,"de","<b>de zon</b> en <b>de maan</b> — sky friends are de!"],
+  ["ster","star","de","⭐",1,"de"],
+  ["wolk","cloud","de","☁️",1,"de"],
+  ["zee","sea","de","🌊",1,"de"],
+  ["berg","mountain","de","⛰️",1,"de"],
+  ["rivier","river","de","🏞️",1,"de"],
+  ["regen","rain","de","🌧️",1,"weather"],
+  ["sneeuw","snow","de","❄️",1,"weather"],
+  ["wind","wind","de","💨",1,"weather"],
+  ["storm","storm","de","⛈️",1,"weather"],
+  ["regenboog","rainbow","de","🌈",1,"de"],
+  ["strand","beach","het","🏖️",1,"het","<b>het strand</b> — where this game lives! 🏖️"],
+  ["bos","forest","het","🌲",1,"het"],
+  ["vuur","fire","het","🔥",1,"het"],
+  ["gras","grass","het","🌿",1,"het"],
+  ["zand","sand","het","🏜️",1,"het"],
+  ["steen","stone","de","🪨",1,"de"],
+  ["eiland","island","het","🏝️",1,"het","<b>het eiland</b> — like all the islands in this world!"],
+
+  /* ---------- LEVEL 1 : transport ---------- */
+  ["fiets","bicycle","de","🚲",1,"de","<b>de fiets</b> — the most Dutch word ever! 🇳🇱"],
+  ["auto","car","de","🚗",1,"de","<b>de auto</b> — broem broem!"],
+  ["trein","train","de","🚂",1,"de","<b>de trein</b> — tsjoeke tsjoeke!"],
+  ["bus","bus","de","🚌",1,"de"],
+  ["boot","boat","de","⛵",1,"de"],
+  ["tram","tram","de","🚊",1,"de"],
+  ["helikopter","helicopter","de","🚁",1,"de"],
+  ["raket","rocket","de","🚀",1,"de"],
+  ["vrachtwagen","truck","de","🚚",1,"de"],
+  ["vliegtuig","airplane","het","✈️",1,"het"],
+  ["schip","ship","het","🚢",1,"het","sneaky! De boot, but <b>het schip</b>!"],
+
+  /* ---------- LEVEL 1 : school, toys & fun ---------- */
+  ["school","school","de","🏫",1,"de"],
+  ["pen","pen","de","🖊️",1,"de"],
+  ["potlood","pencil","het","✏️",1,"het"],
+  ["schaar","scissors","de","✂️",1,"de"],
+  ["papier","paper","het","📄",1,"het"],
+  ["tas","bag","de","🎒",1,"de"],
+  ["speelgoed","toys","het","🧸",1,"het"],
+  ["pop","doll","de","🪆",1,"de"],
+  ["spel","game","het","🎲",1,"sport"],
+  ["puzzel","puzzle","de","🧩",1,"de"],
+  ["bal","ball","de","🏀",1,"de","<b>de bal</b> — but het balle<b>tje</b>!"],
+  ["voetbal","football","het","⚽",1,"sport"],
+  ["muziek","music","de","🎵",1,"de"],
+  ["liedje","song","het","🎶",1,"je"],
+  ["gitaar","guitar","de","🎸",1,"de"],
+  ["piano","piano","de","🎹",1,"de"],
+  ["trommel","drum","de","🥁",1,"de"],
+  ["film","film","de","🎬",1,"de"],
+  ["foto","photo","de","📷",1,"de"],
+  ["kleur","colour","de","🎨",1,"de"],
+  ["feestje","party","het","🎉",1,"je"],
+  ["bloemetje","little flower","het","💐",1,"je"],
+  ["visje","little fish","het","🐠",1,"je"],
+
+  /* ---------- LEVEL 2 : trickier everyday words ---------- */
+  ["lichaam","body","het","🧍",2,"het"],
+  ["hoofd","head","het","🗣️",2,"het"],
+  ["neus","nose","de","👃",2,"de"],
+  ["oor","ear","het","👂",2,"het"],
+  ["oog","eye","het","👁️",2,"het"],
+  ["mond","mouth","de","👄",2,"de"],
+  ["hand","hand","de","✋",2,"de"],
+  ["voet","foot","de","🦶",2,"de"],
+  ["been","leg","het","🦵",2,"het"],
+  ["arm","arm","de","💪",2,"de"],
+  ["haar","hair","het","💇",2,"het"],
+  ["hart","heart","het","❤️",2,"het"],
+  ["tand","tooth","de","🦷",2,"de"],
+  ["buik","belly","de","🫃",2,"de"],
+
+  ["stad","city","de","🏙️",2,"de"],
+  ["dorp","village","het","🏘️",2,"het"],
+  ["land","country","het","🗺️",2,"het"],
+  ["kasteel","castle","het","🏰",2,"het"],
+  ["ziekenhuis","hospital","het","🏥",2,"het"],
+  ["winkel","shop","de","🛒",2,"de"],
+  ["markt","market","de","🧺",2,"de"],
+  ["brug","bridge","de","🌉",2,"de"],
+  ["weg","road","de","🛣️",2,"de"],
+  ["plein","square","het","⛲",2,"het"],
+  ["park","park","het","🏞️",2,"het"],
+  ["molen","windmill","de","🌬️",2,"de","<b>de molen</b> — heel Hollands! 🇳🇱"],
+
+  ["geld","money","het","💰",2,"het"],
+  ["cadeau","present","het","🎁",2,"het"],
+  ["verhaal","story","het","📚",2,"het"],
+  ["woord","word","het","🔤",2,"het"],
+  ["zin","sentence","de","✍️",2,"de"],
+  ["vraag","question","de","❓",2,"de"],
+  ["antwoord","answer","het","💡",2,"het"],
+  ["probleem","problem","het","🤯",2,"het"],
+  ["idee","idea","het","💡",2,"het"],
+  ["nieuws","news","het","📰",2,"het"],
+  ["feest","party","het","🎊",2,"het"],
+  ["verjaardag","birthday","de","🎂",2,"de"],
+  ["week","week","de","📅",2,"time"],
+  ["maand","month","de","🗓️",2,"time"],
+  ["minuut","minute","de","⏱️",2,"time"],
+  ["uur","hour","het","⏰",2,"het","sneaky time word! De week, de maand… but <b>het uur</b> &amp; <b>het jaar</b>!"],
+  ["jaar","year","het","🎆",2,"het","sneaky time word! De week, de maand… but <b>het jaar</b>!"],
+  ["zomer","summer","de","😎",2,"season"],
+  ["winter","winter","de","⛄",2,"season"],
+  ["lente","spring","de","🌱",2,"season"],
+  ["herfst","autumn","de","🍂",2,"season"],
+  ["weer","weather","het","🌦️",2,"het","sneaky! De regen, de wind… but <b>het weer</b> itself!"],
+  ["meer","lake","het","🛶",2,"het"],
+  ["licht","light","het","🔦",2,"het"],
+  ["schaduw","shadow","de","🌑",2,"de"],
+  ["geluid","sound","het","🔊",2,"het"],
+  ["stem","voice","de","🎤",2,"de"],
+  ["droom","dream","de","💭",2,"de"],
+  ["geluk","luck / happiness","het","🍀",2,"ge"],
+  ["liefde","love","de","❤️",2,"de"],
+  ["begin","beginning","het","🚦",2,"het"],
+  ["einde","end","het","🏁",2,"het"],
+  ["huiswerk","homework","het","📝",2,"het"],
+  ["werk","work","het","🧑‍💼",2,"het"],
+
+  /* ---------- LEVEL 2 : magic & adventure ---------- */
+  ["piraat","pirate","de","🏴‍☠️",2,"person"],
+  ["prinses","princess","de","👸",2,"person"],
+  ["prins","prince","de","🤴",2,"person"],
+  ["koning","king","de","👑",2,"ing","a person AND ends in <b>-ing</b> → double de! 👑"],
+  ["koningin","queen","de","👸",2,"person"],
+  ["heks","witch","de","🧙",2,"person"],
+  ["tovenaar","wizard","de","🧙‍♂️",2,"person"],
+  ["ridder","knight","de","⚔️",2,"person"],
+  ["reus","giant","de","🗿",2,"person"],
+  ["kabouter","gnome","de","🍄",2,"person"],
+  ["draak","dragon","de","🐉",2,"animal"],
+  ["spook","ghost","het","👻",2,"het","boo! 👻 <b>het spook</b> — ghosts and monsters are het!"],
+  ["monster","monster","het","👾",2,"het","grrr! <b>het monster</b> — ghosts and monsters are het!"],
+  ["avontuur","adventure","het","🗺️",2,"het"],
+  ["geheim","secret","het","🤫",2,"ge"],
+  ["gevaar","danger","het","⚠️",2,"ge"],
+  ["schat","treasure","de","💎",2,"de"],
+  ["zwaard","sword","het","🗡️",2,"het"],
+  ["toverstaf","magic wand","de","🪄",2,"de"],
+
+  /* ---------- LEVEL 2 : word-ending rules ---------- */
+  ["verrassing","surprise","de","🎁",2,"ing"],
+  ["tekening","drawing","de","🖍️",2,"ing"],
+  ["beloning","reward","de","🏅",2,"ing"],
+  ["verkleedkleding","dress-up clothes","de","🎭",2,"ing"],
+  ["vrijheid","freedom","de","🕊️",2,"heid"],
+  ["waarheid","truth","de","✅",2,"heid"],
+  ["snelheid","speed","de","🏎️",2,"heid"],
+  ["veiligheid","safety","de","🦺",2,"heid"],
+  ["bakkerij","bakery","de","🥐",2,"ij"],
+  ["slagerij","butcher's","de","🥩",2,"ij"],
+  ["boerderij","farm","de","🚜",2,"ij"],
+  ["schilderij","painting","het","🎨",2,"het","SUPER sneaky! -ij is usually de, but it's <b>het schilderij</b>! 🎨"],
+  ["museum","museum","het","🏛️",2,"um"],
+  ["centrum","centre","het","🎯",2,"um"],
+  ["aquarium","aquarium","het","🐠",2,"um"],
+  ["moment","moment","het","⏰",2,"ment"],
+  ["monument","monument","het","🗽",2,"ment"],
+  ["instrument","instrument","het","🎻",2,"ment"],
+  ["toerisme","tourism","het","🧳",2,"isme"],
+  ["gesprek","conversation","het","💬",2,"ge"],
+  ["gebouw","building","het","🏢",2,"ge"],
+  ["geschenk","gift","het","🎀",2,"ge"],
+  ["gezicht","face","het","😊",2,"ge"],
+  ["Nederlands","Dutch (language)","het","🇳🇱",2,"lang"],
+  ["Engels","English (language)","het","🇬🇧",2,"lang"],
+  ["Frans","French (language)","het","🇫🇷",2,"lang"],
+  ["goud","gold","het","🥇",2,"metal"],
+  ["zilver","silver","het","🥈",2,"metal"],
+  ["ijzer","iron","het","🧲",2,"metal"],
+  ["tennis","tennis","het","🎾",2,"sport"],
+  ["hockey","hockey","het","🏑",2,"sport"],
+  ["schaken","chess","het","♟️",2,"sport"],
+
+  /* ---------- LEVEL 2 : plurals (always de!) ---------- */
+  ["boeken","books","de","📚",2,"plural"],
+  ["huizen","houses","de","🏘️",2,"plural"],
+  ["kinderen","children","de","🧒",2,"plural"],
+  ["eieren","eggs","de","🧺",2,"plural"],
+  ["paarden","horses","de","🐴",2,"plural"],
+  ["schepen","ships","de","⛵",2,"plural"],
+];
+
+const TIPS = {
+  animal:  "most animals are <b>de</b>: de kat, de hond, de vis!",
+  animalx: "sneaky exception! Most animals are de, but it's <b>het ___</b>! 🙈",
+  je:      "ends in <b>-je</b> → ALWAYS <b>het</b>! 🐤 Every single time!",
+  person:  "words for people are almost always <b>de</b>! 🧑",
+  fruit:   "fruit &amp; veggies are almost always <b>de</b>! 🍓",
+  plant:   "plants, trees and flowers are almost always <b>de</b>! 🌱",
+  ing:     "ends in <b>-ing</b> → almost always <b>de</b>!",
+  heid:    "ends in <b>-heid</b> → always <b>de</b>!",
+  ij:      "ends in <b>-ij</b> → usually <b>de</b>: de bakkerij, de boerderij!",
+  um:      "ends in <b>-um</b> → <b>het</b>: het museum, het centrum!",
+  ment:    "ends in <b>-ment</b> → <b>het</b>: het moment, het monument!",
+  isme:    "ends in <b>-isme</b> → <b>het</b>!",
+  ge:      "starts with <b>ge-</b> → very often <b>het</b>: het geheim, het gebouw!",
+  lang:    "languages are always <b>het</b>: het Nederlands, het Engels!",
+  metal:   "metals are <b>het</b>: het goud, het zilver, het ijzer!",
+  sport:   "sports &amp; games are usually <b>het</b>: het voetbal, het tennis!",
+  plural:  "more than one → ALWAYS <b>de</b>! 👫 Even het-words: het huis → de huizen!",
+  weather: "weather words are usually <b>de</b>: de regen, de wind (but het weer!)",
+  season:  "seasons are <b>de</b>: de winter, de zomer, de lente, de herfst!",
+  time:    "time words are mostly <b>de</b>: de week, de maand (but het uur, het jaar!)",
+  drink:   "most drinks are <b>de</b>: de melk, de thee (but het water &amp; het sap!)",
+  de:      "learn it as a team: <b>de ___</b> — say it 3 times out loud! 📣",
+  het:     "learn it as a team: <b>het ___</b> — say it 3 times out loud! 📣",
+};
+const WORDS = RAW.map(([nl,en,art,emoji,lvl,cat,tip]) => ({nl,en,art,emoji,lvl,cat,tip}));
+function tipFor(w){ return (w.tip || TIPS[w.cat] || TIPS[w.art]).replaceAll("___", w.nl); }
+
+/* Level 2 sentence templates for De-of-Het Strand (all work with de AND het) */
+const SENTENCES = ["Kijk, ___ X!", "Ik zie ___ X.", "Waar is ___ X?", "___ X is super!", "Daar is ___ X!"];
+
+/* ================= PROFILES / STATE / STARS ================= */
+const PKEY = "nlwonder-profiles";
+const AVATARS = ["🦊","🐰","🦄","🐯","🐸","🐼","🦁","🐙","🦖","🐧","🐵","🐱","🧚","🦸","🤖","👾"];
+const blankProfile = () => ({name:"", avatar:"🦊", flash:0, dehet:0, memory:0, spell:0, level:1});
+
+let profiles = JSON.parse(localStorage.getItem(PKEY) || "{}");
+/* migrate stars from the old single-player save, so nothing is lost */
+const oldSave = localStorage.getItem("nlwonder");
+if(oldSave && Object.keys(profiles).length===0){
+  profiles["p"+Date.now()] = Object.assign(blankProfile(), {name:"Speler", avatar:"🙂"}, JSON.parse(oldSave));
+  localStorage.removeItem("nlwonder");
+}
+let currentId = null, store = null;
+
+function persist(){ localStorage.setItem(PKEY, JSON.stringify(profiles)); }
+function saveStore(){ persist(); refreshStars(); }
+function totalStars(p){ return (p.flash||0)+(p.dehet||0)+(p.memory||0)+(p.spell||0); }
+
+function refreshStars(){
+  if(!store) return;
+  document.getElementById("prof-avatar").textContent = store.avatar;
+  document.getElementById("prof-name").textContent = store.name;
+  document.getElementById("total-stars").textContent = totalStars(store);
+  document.getElementById("stars-flash").textContent  = "⭐".repeat(Math.min(store.flash,5)) || "—";
+  document.getElementById("stars-dehet").textContent  = "⭐".repeat(Math.min(store.dehet,5)) || "—";
+  document.getElementById("stars-memory").textContent = "⭐".repeat(Math.min(store.memory,5)) || "—";
+  document.getElementById("stars-spell").textContent  = "⭐".repeat(Math.min(store.spell,5)) || "—";
+  document.getElementById("lvl1-btn").classList.toggle("sel", store.level===1);
+  document.getElementById("lvl2-btn").classList.toggle("sel", store.level===2);
+}
+function setLevel(l){ store.level = l; saveStore(); }
+
+/* ---- profile picker ---- */
+function openProfiles(){ renderProfiles(); show("profiles"); }
+function renderProfiles(){
+  const grid = document.getElementById("profile-grid");
+  grid.innerHTML = "";
+  Object.entries(profiles).forEach(([id,p])=>{
+    const d = document.createElement("div");
+    d.className = "pcard";
+    d.innerHTML = `<span class="pavatar">${p.avatar}</span><div class="pname"></div>
+      <div class="pstars">⭐ ${totalStars(p)}</div><button class="pedit">✏️</button>`;
+    d.querySelector(".pname").textContent = p.name;
+    d.onclick = ()=>pickProfile(id);
+    d.querySelector(".pedit").onclick = (e)=>{ e.stopPropagation(); openEdit(id); };
+    grid.appendChild(d);
+  });
+  const add = document.createElement("div");
+  add.className = "pcard new";
+  add.innerHTML = `<span class="pavatar">✨</span><div class="pname">Nieuw profiel</div>
+    <div class="pstars">new player</div>`;
+  add.onclick = ()=>openEdit(null);
+  grid.appendChild(add);
+}
+function pickProfile(id){
+  currentId = id;
+  store = Object.assign(blankProfile(), profiles[id]);
+  profiles[id] = store;
+  persist(); refreshStars(); show("home");
+}
+
+/* ---- create / edit ---- */
+let editId = null, chosenAvatar = AVATARS[0];
+function openEdit(id){
+  editId = id;
+  const p = id ? profiles[id] : blankProfile();
+  chosenAvatar = p.avatar;
+  document.getElementById("profedit-title").textContent = id ? "✏️ Profiel aanpassen" : "✨ Nieuw profiel";
+  document.getElementById("profname-input").value = p.name;
+  document.getElementById("profdel-btn").style.display = id ? "inline-block" : "none";
+  renderAvatarGrid();
+  show("profedit");
+  if(!id) setTimeout(()=>document.getElementById("profname-input").focus(), 100);
+}
+function renderAvatarGrid(){
+  const g = document.getElementById("avatar-grid");
+  g.innerHTML = "";
+  AVATARS.forEach(a=>{
+    const b = document.createElement("button");
+    b.className = "avatar-opt" + (a===chosenAvatar ? " sel" : "");
+    b.textContent = a;
+    b.onclick = ()=>{ chosenAvatar = a; renderAvatarGrid(); };
+    g.appendChild(b);
+  });
+}
+function saveProfile(){
+  const name = document.getElementById("profname-input").value.trim() || "Speler";
+  if(editId){
+    profiles[editId].name = name;
+    profiles[editId].avatar = chosenAvatar;
+    persist();
+    if(editId === currentId) refreshStars();
+    openProfiles();
+  } else {
+    const id = "p"+Date.now();
+    profiles[id] = Object.assign(blankProfile(), {name, avatar:chosenAvatar});
+    persist();
+    pickProfile(id); /* new player jumps straight into the world */
+  }
+}
+function deleteProfile(){
+  const p = profiles[editId];
+  if(!confirm(`Profiel van ${p.name} echt weggooien? (${totalStars(p)} ⭐ gaan verloren!)`)) return;
+  delete profiles[editId];
+  if(editId === currentId){ currentId = null; store = null; }
+  persist(); openProfiles();
+}
+renderProfiles();
+
+function pool(){ return WORDS.filter(w => w.lvl === store.level); }
+
+function show(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active"); window.scrollTo(0,0); }
+function goHome(){ show("home"); refreshStars(); }
+function openRules(){ show("rules"); }
+
+/* ================= SPEECH ================= */
+let dutchVoice = null;
+function pickVoice(){
+  const v = speechSynthesis.getVoices();
+  dutchVoice = v.find(x=>x.lang==="nl-NL") || v.find(x=>x.lang.startsWith("nl")) || null;
+}
+if (window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text){
+  if(!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "nl-NL"; if(dutchVoice) u.voice = dutchVoice; u.rate = 0.85;
+  speechSynthesis.speak(u);
+}
+
+/* ================= CONFETTI / UTILS ================= */
+function confetti(){
+  const emo = ["🎉","⭐","🌷","✨","🧀","🎊"];
+  for(let i=0;i<8;i++){
+    const s=document.createElement("span"); s.className="confetti";
+    s.textContent = emo[Math.floor(Math.random()*emo.length)];
+    s.style.left = (15+Math.random()*70)+"vw"; s.style.top = (20+Math.random()*50)+"vh";
+    document.body.appendChild(s); setTimeout(()=>s.remove(),900);
+  }
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* ================= FLASHCARDS ================= */
+let flashDeck=[], flashIdx=0;
+function openFlash(){
+  flashDeck = shuffle([...pool()]).slice(0, store.level===2 ? 15 : 10);
+  flashIdx=0; show("flash"); renderFlash();
+}
+function renderFlash(){
+  const w = flashDeck[flashIdx];
+  document.getElementById("flash-emoji").textContent = w.emoji;
+  const badge = document.getElementById("flash-article");
+  badge.textContent = w.art; badge.className = "article-badge badge-"+w.art;
+  document.getElementById("flash-word").textContent = " "+w.nl;
+  document.getElementById("flash-trans").textContent = "the "+w.en.replace(/^the /,"");
+  document.getElementById("flash-count").textContent = (flashIdx+1)+" / "+flashDeck.length;
+  document.getElementById("flash-progress").style.width = ((flashIdx+1)/flashDeck.length*100)+"%";
+  speakCurrent();
+}
+function speakCurrent(){ const w=flashDeck[flashIdx]; speak(w.art+" "+w.nl); }
+function flashNext(){
+  if(flashIdx < flashDeck.length-1){ flashIdx++; renderFlash(); }
+  else { store.flash++; saveStore(); confetti(); goHome(); }
+}
+
+/* ================= DE / HET ================= */
+let dhDeck=[], dhIdx=0, dhScore=0, dhStreak=0, dhRound=10, currentDH=null, currentTpl=null, dhLocked=false;
+function openDehet(){
+  dhRound = store.level===2 ? 15 : 10;
+  dhDeck = shuffle([...pool()]).slice(0, dhRound);
+  dhIdx=0; dhScore=0; dhStreak=0; dhLocked=false;
+  show("dehet"); renderDH();
+}
+function renderDH(){
+  currentDH = dhDeck[dhIdx]; dhLocked=false;
+  document.getElementById("dh-emoji").textContent = currentDH.emoji;
+  if(store.level===2){
+    currentTpl = SENTENCES[Math.floor(Math.random()*SENTENCES.length)];
+    document.getElementById("dh-word").innerHTML =
+      currentTpl.replace("___",'<span class="blank">___</span>').replace("X","<b>"+currentDH.nl+"</b>");
+  } else {
+    currentTpl = null;
+    document.getElementById("dh-word").textContent = currentDH.nl;
+  }
+  document.getElementById("dh-trans").textContent = currentDH.en;
+  document.getElementById("dh-feedback").innerHTML = "";
+  document.getElementById("dh-score").textContent = dhScore;
+  document.getElementById("dh-streak").textContent = dhStreak;
+  document.getElementById("dh-progress").style.width = (dhIdx/dhRound*100)+"%";
+}
+function answerDH(choice){
+  if(dhLocked) return; dhLocked=true;
+  const ok = choice === currentDH.art;
+  const fb = document.getElementById("dh-feedback");
+  const full = currentTpl
+    ? currentTpl.replace("___", currentDH.art).replace("X", currentDH.nl)
+    : currentDH.art+" "+currentDH.nl;
+  if(ok){
+    dhScore++; dhStreak++;
+    fb.innerHTML = `<div class="verdict good">✅ Goed zo! <u>${full}</u></div>
+      <div class="streak">${dhStreak>=3 ? "🔥".repeat(Math.min(dhStreak,5))+" Streak: "+dhStreak+"!" : ""}</div>`;
+    if(dhStreak>0 && dhStreak%5===0) confetti();
+  } else {
+    dhStreak=0;
+    fb.innerHTML = `<div class="verdict bad">❌ Bijna! It is <u>${full}</u></div>`;
+  }
+  fb.innerHTML += `<div class="rule-tip">🦉 <b>Owl tip:</b> ${tipFor(currentDH)}</div>
+    <div class="btn-row"><button class="btn-big btn-green" onclick="nextDH()">Volgende ➡️</button></div>`;
+  speak(full.replace(/[!?.]/g,""));
+  document.getElementById("dh-score").textContent = dhScore;
+  document.getElementById("dh-streak").textContent = dhStreak;
+}
+function nextDH(){
+  dhIdx++;
+  if(dhIdx < dhRound){ renderDH(); }
+  else {
+    const pct = dhScore/dhRound;
+    const stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.5 ? 1 : 0;
+    store.dehet += stars; saveStore();
+    if(stars>0) confetti();
+    document.getElementById("dh-progress").style.width = "100%";
+    document.querySelector("#dehet .card").innerHTML = `
+      <span class="big-emoji">${stars>=2?"🏆":stars===1?"🎖️":"💪"}</span>
+      <div class="word">${dhScore} / ${dhRound} goed!</div>
+      <div class="translation">${"⭐".repeat(stars) || "Try again — you can do it!"}</div>
+      <div class="btn-row">
+        <button class="btn-big btn-green" onclick="rebuildDehet(); openDehet()">🔄 Nog een keer!</button>
+        <button class="btn-big btn-green" style="background:#888" onclick="rebuildDehet(); goHome()">🏠 Home</button>
+      </div>`;
+  }
+}
+const dehetCardHTML = document.querySelector("#dehet .card").innerHTML;
+function rebuildDehet(){ document.querySelector("#dehet .card").innerHTML = dehetCardHTML; }
+
+/* ================= SPELLING BEE ================= */
+let spDeck=[], spIdx=0, spWord=null, spBuilt=[], spTries=0, spFirstTry=0, spLocked=false;
+const SP_ROUND = 8;
+function openSpell(){
+  /* keep it spellable: single words, not too long, no capitals (languages) */
+  const ok = pool().filter(w => w.nl.length <= 11 && !/[A-Z]/.test(w.nl[0]));
+  spDeck = shuffle([...ok]).slice(0, SP_ROUND);
+  spIdx=0; spFirstTry=0;
+  show("spell"); renderSpell();
+}
+function renderSpell(){
+  spWord = spDeck[spIdx]; spBuilt=[]; spTries=0; spLocked=false;
+  document.getElementById("sp-emoji").textContent = spWord.emoji;
+  document.getElementById("sp-trans").textContent = "the "+spWord.en.replace(/^the /,"");
+  document.getElementById("sp-count").textContent = (spIdx+1)+" / "+SP_ROUND;
+  document.getElementById("sp-progress").style.width = (spIdx/SP_ROUND*100)+"%";
+  document.getElementById("sp-feedback").innerHTML = "";
+  const lvl2 = store.level===2;
+  document.getElementById("sp-tiles-area").style.display = lvl2 ? "none" : "block";
+  document.getElementById("sp-type-area").style.display  = lvl2 ? "block" : "none";
+  document.getElementById("sp-hint").innerHTML = lvl2
+    ? "Type the whole thing: <b>de of het</b> + the word!"
+    : `It starts with a <b>${spWord.art==="de"?"red de":"blue het"}</b>: <span class="article-badge badge-${spWord.art}">${spWord.art}</span>`;
+  if(lvl2){
+    const inp = document.getElementById("sp-input");
+    inp.value=""; inp.disabled=false; setTimeout(()=>inp.focus(),50);
+  } else {
+    buildTiles();
+  }
+  speakSpell();
+}
+function speakSpell(){ speak(spWord.art+" "+spWord.nl); }
+function buildTiles(){
+  const slots = document.getElementById("sp-slots");
+  const tiles = document.getElementById("sp-tiles");
+  slots.innerHTML=""; tiles.innerHTML="";
+  spWord.nl.split("").forEach(()=> {
+    const s=document.createElement("div"); s.className="slot"; slots.appendChild(s);
+  });
+  shuffle(spWord.nl.split("")).forEach(ch=>{
+    const b=document.createElement("button"); b.className="tile"; b.textContent=ch;
+    b.onclick=()=>{ if(spLocked || b.disabled) return;
+      b.disabled=true; spBuilt.push({ch, tile:b}); paintSlots();
+      if(spBuilt.length===spWord.nl.length) checkBuilt();
+    };
+    tiles.appendChild(b);
+  });
+  paintSlots();
+}
+function paintSlots(){
+  document.querySelectorAll("#sp-slots .slot").forEach((s,i)=>{
+    s.textContent = spBuilt[i] ? spBuilt[i].ch : "";
+    s.classList.toggle("filled", !!spBuilt[i]);
+  });
+}
+function spBackspace(){
+  if(spLocked) return;
+  const last = spBuilt.pop();
+  if(last) last.tile.disabled=false;
+  paintSlots();
+}
+function checkBuilt(){
+  const guess = spBuilt.map(x=>x.ch).join("");
+  spResult(guess === spWord.nl, spWord.art+" "+spWord.nl, ()=>{
+    spBuilt.forEach(x=>x.tile.disabled=false); spBuilt=[]; paintSlots();
+  });
+}
+function spCheckTyped(){
+  if(spLocked) return;
+  const inp = document.getElementById("sp-input");
+  const guess = inp.value.trim().toLowerCase().replace(/\s+/g," ");
+  if(!guess) return;
+  spResult(guess === (spWord.art+" "+spWord.nl).toLowerCase(), spWord.art+" "+spWord.nl,
+    ()=>{ inp.value=""; inp.focus(); });
+}
+function spResult(ok, answer, resetFn){
+  const fb = document.getElementById("sp-feedback");
+  if(ok){
+    spLocked=true;
+    if(spTries===0) spFirstTry++;
+    fb.innerHTML = `<div class="verdict good">✅ Knap gespeld! <u>${answer}</u> 🐝</div>
+      <div class="btn-row"><button class="btn-big btn-green" onclick="nextSpell()">Volgende ➡️</button></div>`;
+    speak(answer); confetti();
+  } else {
+    spTries++;
+    if(spTries >= 2){
+      spLocked=true;
+      fb.innerHTML = `<div class="verdict bad">😅 Tricky one! It is: <u>${answer}</u></div>
+        <div class="btn-row"><button class="btn-big btn-green" onclick="nextSpell()">Volgende ➡️</button></div>`;
+      speak(answer);
+    } else {
+      fb.innerHTML = `<div class="verdict bad">❌ Bijna! Listen again and try once more!</div>`;
+      document.querySelector("#spell .card").classList.add("shake");
+      setTimeout(()=>document.querySelector("#spell .card").classList.remove("shake"), 400);
+      resetFn(); speakSpell();
+    }
+  }
+}
+function nextSpell(){
+  spIdx++;
+  if(spIdx < SP_ROUND){ renderSpell(); }
+  else {
+    const stars = spFirstTry >= 7 ? 3 : spFirstTry >= 5 ? 2 : spFirstTry >= 3 ? 1 : 0;
+    store.spell += stars; saveStore();
+    if(stars>0) confetti();
+    document.getElementById("sp-progress").style.width="100%";
+    document.getElementById("sp-tiles-area").style.display="none";
+    document.getElementById("sp-type-area").style.display="none";
+    document.getElementById("sp-emoji").textContent = stars>=2 ? "🏆" : stars===1 ? "🎖️" : "💪";
+    document.getElementById("sp-trans").textContent = "";
+    document.getElementById("sp-hint").innerHTML = `<span class="word">${spFirstTry} / ${SP_ROUND} in één keer goed!</span><br>${"⭐".repeat(stars) || "Try again — you can do it!"}`;
+    document.getElementById("sp-feedback").innerHTML = `<div class="btn-row">
+      <button class="btn-big btn-green" onclick="openSpell()">🔄 Nog een keer!</button>
+      <button class="btn-big btn-green" style="background:#888" onclick="goHome()">🏠 Home</button></div>`;
+  }
+}
+
+/* ================= MEMORY ================= */
+let memFirst=null, memLock=false, memMoves=0, memMatched=0, memPairs=6;
+function openMemory(){ show("memory"); startMemory(); }
+function startMemory(){
+  memPairs = store.level===2 ? 8 : 6;
+  const grid = document.getElementById("memory-grid");
+  grid.innerHTML=""; memFirst=null; memLock=false; memMoves=0; memMatched=0;
+  document.getElementById("mem-moves").textContent = 0;
+  const picks = shuffle([...pool()]).slice(0,memPairs);
+  const cards = [];
+  picks.forEach((w,i)=>{
+    if(store.level===2){
+      /* level 2: match Dutch word ↔ English word (no picture help!) */
+      cards.push({key:i, face:w.art+" "+w.nl, word:w, isText:true});
+      cards.push({key:i, face:"the "+w.en.replace(/^the /,""), word:w, isText:true});
+    } else {
+      cards.push({key:i, face:w.emoji, word:w, isText:false});
+      cards.push({key:i, face:w.art+" "+w.nl, word:w, isText:true});
+    }
+  });
+  shuffle(cards).forEach(c=>{
+    const d=document.createElement("div");
+    d.className="mcard"; d.textContent="?";
+    d.onclick=()=>flipCard(d,c);
+    grid.appendChild(d);
+  });
+}
+function flipCard(el,c){
+  if(memLock || el.classList.contains("flipped") || el.classList.contains("matched")) return;
+  el.classList.add("flipped");
+  el.innerHTML = c.isText ? `<span class="small">${c.face}</span>` : c.face;
+  if(!memFirst){ memFirst={el,c}; return; }
+  memMoves++; document.getElementById("mem-moves").textContent = memMoves;
+  if(memFirst.c.key === c.key && memFirst.el !== el){
+    el.classList.add("matched"); memFirst.el.classList.add("matched");
+    speak(c.word.art+" "+c.word.nl);
+    memFirst=null; memMatched++;
+    if(memMatched===memPairs){
+      confetti(); store.memory++; saveStore();
+      setTimeout(()=>alert("🏆 Gewonnen in "+memMoves+" beurten! ⭐"), 400);
+    }
+  } else {
+    memLock=true;
+    const f=memFirst; memFirst=null;
+    setTimeout(()=>{
+      el.classList.remove("flipped"); el.textContent="?";
+      f.el.classList.remove("flipped"); f.el.textContent="?";
+      memLock=false;
+    }, 900);
+  }
+}
+</script>
+</body>
+</html>
